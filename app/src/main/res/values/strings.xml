@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Tweets App</string>
+
+
+    <string name="APP_ID">eqWrRArBqWWbMLFHOBiqRKuYmtl8lC5JpoMToeHF</string>
+    <string name="CLIENT_KEY">IoHFNgTpDIJN6bLhmBEQ6dIY59gujIwV5QrltsmH</string>
+    <string name="URL">https://parseapi.back4app.com/</string>
+    <string name="title_activity_my_tweet">MyTweet</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="sendTweet">Send a Tweet...</string>
+
+
+</resources>
