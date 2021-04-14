@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -23,86 +24,78 @@ import com.shashank.sony.fancytoastlib.FancyToast;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
-public class SendTweetActivity extends AppCompatActivity {
+public class SendTweetActivity extends AppCompatActivity implements
+View.OnClickListener {
 
     private EditText etSendTweet;
     private Button btnSendTweet;
     private Button btnShowOtherTweets;
     private ListView listViewOthersTweets;
-    private ArrayAdapter simpleAdapter;
-    private ArrayList<String> listOfOthersTweets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_tweet);
-        setTitle(ParseUser.getCurrentUser().getUsername() + "'s Tweets");
+        setTitle("Tweets " + ParseUser.getCurrentUser().getUsername() + "is Following");
 
         etSendTweet = findViewById(R.id.et_send_tweet);
         btnSendTweet = findViewById(R.id.btn_send_tweet);
         btnShowOtherTweets = findViewById(R.id.btn_show_other_tweets);
         listViewOthersTweets = findViewById(R.id.listview_others_tweets);
 
-        listOfOthersTweets = new ArrayList<>();
-        simpleAdapter = new ArrayAdapter(SendTweetActivity.this,
-                android.R.layout.simple_list_item_1, listOfOthersTweets);
-        listViewOthersTweets.setAdapter(simpleAdapter);
-
         btnSendTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendTweet();
-
             }
         });
 
-        btnShowOtherTweets.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showOtherTweets();
-            }
-        });
+        btnShowOtherTweets.setOnClickListener(this);
 
     }
 
-    private void showOtherTweets() {
-        // parse query to get all others tweete
-        // pupulate the listview
+    @Override
+    public void onClick(View view) {
+
+        final ArrayList<HashMap<String, String>> tweetList = new ArrayList<>();
+
+        final SimpleAdapter adapter = new SimpleAdapter(SendTweetActivity.this, tweetList,
+                android.R.layout.simple_list_item_2, new String[]{"tweetUserName", "tweetValue"},
+                new int[]{android.R.id.text1, android.R.id.text2});
 
         try {
-
             ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("MyTweet");
-            if (ParseUser.getCurrentUser() != null) {
-                parseQuery.whereNotEqualTo("user",
-                        ParseUser.getCurrentUser().getUsername());
+            parseQuery.whereContainedIn("user", ParseUser.getCurrentUser().getList("fanOf"));
+            parseQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> objects, ParseException e) {
 
-                parseQuery.findInBackground(new FindCallback<ParseObject>() {
-                    @RequiresApi(api = Build.VERSION_CODES.N)
-                    @Override
-                    public void done(List<ParseObject> tweets, ParseException e) {
+                    if (objects.size() > 0 && e == null) {
 
-                        if(tweets.size() > 0 && e == null) {
+                        for (ParseObject tweetObject : objects) {
+                            HashMap<String, String> userTweet = new HashMap<>();
+                            userTweet.put("tweetUserName", tweetObject.getString("user"));
+                            userTweet.put("tweetValue", tweetObject.getString("tweet"));
+                            tweetList.add(userTweet);
 
-                            for(ParseObject tweet: tweets) {
-                                FancyToast.makeText(SendTweetActivity.this,
-                                        tweets.get(0).get("tweet").toString(),
-                                        FancyToast.LENGTH_LONG, FancyToast.SUCCESS, true).show();
-                                listOfOthersTweets.add(tweet.get("tweet").toString());
-                            }
-                            listViewOthersTweets.setAdapter(simpleAdapter);
                         }
+
+                        listViewOthersTweets.setAdapter(adapter);
+
                     }
-                });
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
 
     }
+
 
 
     private void sendTweet() {
@@ -141,5 +134,6 @@ public class SendTweetActivity extends AppCompatActivity {
         }
 
     }
+
 
 }

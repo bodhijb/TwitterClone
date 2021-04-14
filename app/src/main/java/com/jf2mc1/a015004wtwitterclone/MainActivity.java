@@ -130,12 +130,6 @@ public class MainActivity extends AppCompatActivity implements
             });
 
         }
-
-
-
-
-
-
     }
 
     private void goToTweetActvity() {

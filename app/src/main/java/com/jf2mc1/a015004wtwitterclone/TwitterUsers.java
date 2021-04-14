@@ -39,7 +39,7 @@ public class TwitterUsers extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_twitter_users);
-        setTitle(ParseUser.getCurrentUser().getUsername() + "is Following");
+        setTitle(ParseUser.getCurrentUser().getUsername() + " is Following");
 
         listViewTwitters = findViewById(R.id.listview_twitters);
         mArrayList = new ArrayList<>();
